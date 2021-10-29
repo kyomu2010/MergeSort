@@ -32,6 +32,32 @@ public class Mergesort {
 		Arrays.stream(nums).forEach(System.out::println);
 	}
 
+	public void parallelMergeSort(int low, int high, int numOfThreads) {
+		if (numOfThreads <= 1) {
+			// use sequential mergesort
+			mergeSort(low, high);
+			return;
+		}
+
+		int middleIndex = (low + high) / 2;
+
+		Thread leftsorter = mergeSortParallel(low, middleIndex, numOfThreads);
+		Thread rightSorter = mergeSortParallel(middleIndex + 1, high, numOfThreads);
+
+		leftsorter.start();
+		rightSorter.start();
+		
+		// make threads wait for each other
+		try {
+			leftsorter.join();
+			rightSorter.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		merge(low, middleIndex, high);
+	}
+
 	private void merge(int low, int middle, int high) {
 
 		// copy nums[i] -> tempArray[i]
@@ -67,6 +93,16 @@ public class Mergesort {
 			k++;
 			j++;
 		}
+	}
+
+	private Thread mergeSortParallel(int low, int high, int numOfThreads) {
+		return new Thread() {
+
+			@Override
+			public void run() {
+				parallelMergeSort(low, high, numOfThreads / 2);
+			}
+		};
 	}
 
 	public boolean isSorted() {
