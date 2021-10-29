@@ -1,1 +1,1 @@
-## A java program demonstrating mergesort as a parallel algorithm
+## A java program demonstrating mergesort as a sequential algorithm
